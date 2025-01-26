@@ -65,7 +65,7 @@ Scripts para ejecutar Maven sin instalarlo globalmente:
 
 - `mvnw`: Usar en Linux/Mac.
 - `mvnw.cmd`: Usar en Windows.
----
+
 ### 💡 ¿Cómo funciona todo junto?
 
 **Spring Boot**: Gestiona la lógica del **CRUD** (controladores, servicios, repositorios).
@@ -75,3 +75,138 @@ Scripts para ejecutar Maven sin instalarlo globalmente:
 **Docker**: Levanta **PostgreSQL** mediante `docker-compose.yml`.
 
 **Maven**: Compila el proyecto y gestiona las dependencias.
+
+---
+
+## 📂 Estructura de Controllers, Entities y Repositories
+
+### 1. Controllers
+
+Esta carpeta contiene las clases que definen los endpoints de la API. Son responsables de manejar las solicitudes HTTP (GET, POST, PUT, DELETE, etc.) y delegar la lógica al repositorio o al servicio correspondiente.
+
+- `ProductoController`: Define los endpoints para interactuar con los productos:
+    - Obtener todos los productos.
+    - Obtener un producto por ID.
+    - Crear un nuevo producto.
+    - Actualizar un producto existente.
+    - Eliminar un producto por ID.
+
+### 2. Entities 
+Aquí se definen las clases que representan las tablas de la base de datos. Estas clases son los modelos del proyecto.
+
+- `Producto`: Representa la tabla de productos en la base de datos, con atributos como:
+    - `id`: Identificador único del producto.
+    - `nombre`: Nombre del producto.
+    - `precio`: Precio del producto.
+
+### 3. Repositories
+Esta carpeta contiene las interfaces que extienden de JpaRepository o CrudRepository, que proporcionan métodos básicos para interactuar con la base de datos sin escribir consultas SQL manuales.
+
+- ProductoRepository: Es una interfaz que permite:
+    - Guardar, actualizar y eliminar productos.
+    - Buscar productos por ID o todos los registros.
+
+## Explicancion del Codigo
+
+### 📋 ProductoController
+
+```java
+@RestController
+@RequestMapping("/productos")
+public class ProductoController {
+```
+Define un controlador REST que responde a las solicitudes enviadas a `/productos`.
+
+### Metodos
+
+### 1. Obtener todos los productos
+```java
+@GetMapping
+public List<Producto> obtenerProductos() {
+    return productoRepository.findAll();
+}
+```
+Devuelve una lista de todos los productos desde la base de datos.
+
+### 2. Obtener producto por ID:
+```java
+@GetMapping("/{id}")
+public Producto obtenerProductoPorId(@PathVariable Long id) {
+    return productoRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("No se encontró el producto con el id: " + id));
+}
+```
+Busca un producto por su ID.
+Lanza un error si el producto no existe.
+
+### 3. Crear un producto:
+```java
+@PostMapping
+public Producto crearProducto(@RequestBody Producto producto) {
+    return productoRepository.save(producto);
+}
+```
+Crea un nuevo producto y lo guarda en la base de datos.
+
+### 4. Actualizar un producto:
+```java
+@PutMapping("/{id}")
+public Producto actualizarProducto(@PathVariable Long id, @RequestBody Producto detallesProducto) {
+    Producto producto = productoRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("No se encontró el producto con el ID: " + id));
+
+    producto.setNombre(detallesProducto.getNombre());
+    producto.setPrecio(detallesProducto.getPrecio());
+
+    return productoRepository.save(producto);
+}
+```
+Actualiza el nombre y precio de un producto existente.
+
+### 5. Eliminar un producto:
+```java
+@DeleteMapping("/{id}")
+public String borrarProducto(@PathVariable Long id) {
+    Producto producto = productoRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("No se encontró el producto con el id: " + id));
+
+    productoRepository.delete(producto);
+    return "El producto con el ID: " + id + " fue eliminado correctamente.";
+}
+```
+Borra un producto de la base de datos y devuelve un mensaje de confirmación.
+
+---
+
+# 📋 ProductoRepository
+```java
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
+}
+```
+Extiende de JpaRepository, lo que permite utilizar métodos ya implementados como:
+- `findAll()`: Buscar todos los registros.
+- `findById(Long id)`: Buscar un registro por su ID.
+- `save(Producto producto)`: Guardar o actualizar un producto.
+- `delete(Producto producto)`: Eliminar un producto.
+
+---
+
+# 📋 ApirestApplication
+```java
+@SpringBootApplication
+public class ApirestApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ApirestApplication.class, args);
+    }
+}
+```
+Punto de entrada del proyecto.
+Usa `SpringApplication.run` para iniciar la aplicación.
+
+---
+
+# 📝 Resumen
+
+*Controllers*: Manejan las solicitudes HTTP y llaman al repositorio.
+*Entities*: Representan las tablas de la base de datos.
+*Repositories*: Proveen métodos predefinidos para interactuar con la base de datos.
