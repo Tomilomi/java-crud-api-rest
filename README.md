@@ -106,6 +106,8 @@ Esta carpeta contiene las interfaces que extienden de JpaRepository o CrudReposi
     - Guardar, actualizar y eliminar productos.
     - Buscar productos por ID o todos los registros.
 
+---
+
 ## Explicancion del Codigo
 
 ### 📋 ProductoController
