@@ -207,6 +207,6 @@ Usa `SpringApplication.run` para iniciar la aplicación.
 
 # 📝 Resumen
 
-*Controllers*: Manejan las solicitudes HTTP y llaman al repositorio.
-*Entities*: Representan las tablas de la base de datos.
-*Repositories*: Proveen métodos predefinidos para interactuar con la base de datos.
+- *Controllers*: Manejan las solicitudes HTTP y llaman al repositorio.
+- *Entities*: Representan las tablas de la base de datos.
+- *Repositories*: Proveen métodos predefinidos para interactuar con la base de datos.
